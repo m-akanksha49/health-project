@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hospital Information</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background-color: #262629;
+      background-image: url(https://i0.wp.com/stanzaliving.wpcomstaging.com/wp-content/uploads/2024/05/72b61-top-hospitals-in-jaipur.jpg?fit=1000%2C571&ssl=1);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    h1 {
+      text-align: center;
+      color: #239f85;
+      padding: 30px 0;
+    }
+    .container {
+      width: 200%;
+      height: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+    .scroller {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      max-width: 800px;
+    }
+    .hospital-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      background-color: #fdfcfc;
+      border: 3px solid #239f85;
+      border-radius: 8px;
+    }
+    .hospital-card img {
+      width: 100%;
+      max-width: 180px;
+      height: auto;
+      border-radius: 5px;
+    }
+    .hospital-card h2 {
+      margin: 10px 0;
+      color: #ff5d22;
+    }
+    .hospital-card p {
+      margin: 5px 0;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #239f85;
+      color: #fff;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 1em;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    @media (max-width: 768px) {
+      .hospital-card {
+        padding: 15px;
+      }
+      .hospital-card h2 {
+        font-size: 1.2em;
+      }
+      .hospital-card p {
+        font-size: 0.9em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hospital Information</h1>
+    <div class="scroller">
+      <div class="hospital-card">
+        <img src="https://genymedium.com/geny-app/geny-data/uploads/2017/12/APOLLO-HOSPITALS-LOGO.jpg" alt="Apollo Hospital">
+        <h2>Apollo Hospitals</h2>
+        <p><strong>Established:</strong> 1983</p>
+        <p><strong>Timings:</strong> 24/7</p>
+        <p><strong>Services:</strong> Cardiology, Neurology, Oncology, Orthopedics, Emergency</p>
+        <p><strong>Info:</strong> Apollo Hospitals is a pioneering healthcare institution in India, known for advanced treatments and quality care.</p>
+        <p><strong><a href="https://www.apollohospitals.com">MORE INFO</a></strong></p>
+      </div>
+
+      <div class="hospital-card">
+        <img src="https://images1-fabric.practo.com/practices/642087/care-hospital-hyderabad-5c5acf5b62052.jpg" alt="Care Hospital">
+        <h2>Care Hospitals</h2>
+        <p><strong>Established:</strong> 1997</p>
+        <p><strong>Timings:</strong> 24/7</p>
+        <p><strong>Services:</strong> Critical Care, Cardiology, Nephrology, Emergency</p>
+        <p><strong>Info:</strong> CARE Hospitals Group offers multi-specialty healthcare services across India, with a focus on affordability and accessibility.</p>
+        <p><strong><a href="https://www.carehospitals.com/">MORE INFO</a></strong></p>
+      </div>
+
+      <div class="hospital-card">
+        <img src="https://media.telanganatoday.com/wp-content/uploads/2024/02/kamineni.jpg" alt="Kamineni Hospital">
+        <h2>Kamineni Hospital</h2>
+        <p><strong>Established:</strong> 1995</p>
+        <p><strong>Timings:</strong> 8 AM - 10 PM</p>
+        <p><strong>Services:</strong> General Medicine, Cardiology, Neurology, Pediatrics</p>
+        <p><strong>Info:</strong> Known for its skilled doctors and modern facilities, Kamineni Hospitals provide comprehensive care across specialties.</p>
+        <p><strong><a href="https://kaminenihospitals.com">MORE INFO</a></strong></p>
+      </div>
+
+      <div class="hospital-card">
+        <img src="https://www.generalatlantic.com/wp-content/uploads/2018/06/kims-logo-transparent.png" alt="KIMS Hospital">
+        <h2>KIMS Hospital</h2>
+        <p><strong>Established:</strong> 2000</p>
+        <p><strong>Timings:</strong> 24/7</p>
+        <p><strong>Services:</strong> Cardiology, Gastroenterology, Neurology, Pulmonology</p>
+        <p><strong>Info:</strong> KIMS is a large healthcare network offering specialized services with state-of-the-art medical technology.</p>
+        <p><strong><a href="https://www.kimshospitals.com">MORE INFO</a></strong></p>
+      </div>
+
+      <div class="hospital-card">
+        <img src="https://th.bing.com/th/id/OIP.6vvXNmVUyr_gABxQn3d16wHaHa?rs=1&pid=ImgDetMain" alt="Aster Hospital">
+        <h2>Aster Hospitals</h2>
+        <p><strong>Established:</strong> 1987</p>
+        <p><strong>Timings:</strong> 24/7</p>
+        <p><strong>Services:</strong> Orthopedics, ENT, Emergency, Pediatrics</p>
+        <p><strong>Info:</strong> Aster Hospitals provide a variety of healthcare services globally, known for excellence in clinical care.</p>
+        <p><strong><a href="https://www.asterhospitals.in/hospitals/aster-prime-hyderabad">MORE INFO</a></strong></p>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <small>Contact your nearest hospital in emergencies</small><br>
+    Get Checked, Be Safe!
+  </footer>
+</body>
+</html>

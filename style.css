@@ -1,0 +1,178 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Tricolor Patriotic Background */
+body {
+    background: linear-gradient(135deg, #ff9933 0%, #ffffff 40%, #138808 100%);
+    background-size: 200% 200%;
+    animation: patrioticPulse 15s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Background animation */
+@keyframes patrioticPulse {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Container/Card Styling */
+.container {
+    background: #ffffffdd;
+    width: 450px;
+    padding: 2rem;
+    border-radius: 15px;
+    border: 2px solid rgba(255, 153, 51, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.2s ease-in-out;
+    transition: all 0.3s ease;
+}
+
+.container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
+/* Form Title */
+.form-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+/* Input Fields */
+.input-group {
+    position: relative;
+    margin: 20px 0;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.input-group input:focus {
+    border-color: #138808;
+    box-shadow: 0 0 8px rgba(19, 136, 8, 0.4);
+    outline: none;
+}
+
+.input-group input::placeholder {
+    color: transparent;
+}
+
+/* Floating Label Effect */
+.input-group label {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: #757575;
+    transition: 0.3s;
+    pointer-events: none;
+    background: white;
+    padding: 0 5px;
+}
+
+.input-group input:focus ~ label,
+.input-group input:not(:placeholder-shown) ~ label {
+    top: -10px;
+    left: 10px;
+    font-size: 0.85rem;
+    color: #ff9933;
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(45deg, #ff9933, #138808);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.4s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background: linear-gradient(45deg, #138808, #ff9933);
+    transform: scale(1.05);
+}
+
+/* Social Icons */
+.icons {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.icons i {
+    font-size: 1.6rem;
+    margin: 0 10px;
+    cursor: pointer;
+    transition: transform 0.3s, color 0.3s;
+    color: #138808;
+}
+
+.icons i:hover {
+    transform: scale(1.2);
+    color: #ff9933;
+}
+
+/* Message Box with Animation */
+.messageDiv {
+    background: linear-gradient(45deg, #ff9933, #138808);
+    color: white;
+    padding: 12px 20px;
+    margin: 15px 0;
+    border-radius: 8px;
+    font-size: 1rem;
+    opacity: 0;
+    animation: fadeOut 7s forwards;
+    transform: scale(0.9);
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+/* Smooth Fade In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

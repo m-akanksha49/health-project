@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Monitoring Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .big-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--light);
+        }
+        
+        .form {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .input-box {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        .input-box:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .health-metrics {
+            grid-column: 1 / -1;
+        }
+        
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        
+        .metric-card {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .metric-card.normal .metric-value {
+            color: var(--success);
+        }
+        
+        .metric-card.warning .metric-value {
+            color: var(--warning);
+        }
+        
+        .metric-card.danger .metric-value {
+            color: var(--accent);
+        }
+        
+        .chart-container {
+            height: 250px;
+            margin-top: 15px;
+        }
+        
+        .risk-indicator {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: var(--light);
+        }
+        
+        .risk-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .risk-low .risk-icon {
+            background-color: var(--success);
+        }
+        
+        .risk-medium .risk-icon {
+            background-color: var(--warning);
+        }
+        
+        .risk-high .risk-icon {
+            background-color: var(--accent);
+        }
+        
+        .suggestion-list {
+            list-style: none;
+        }
+        
+        .suggestion-list li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .suggestion-list li:before {
+            content: "•";
+            color: var(--secondary);
+            position: absolute;
+            left: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .profile-card {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .profile-info h4 {
+            margin-bottom: 5px;
+        }
+        
+        .profile-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .hospital-card {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .hospital-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .hospital-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .hospital-distance {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .hospital-details {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .profiles-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="big-container">
+        <h1>Health Monitoring Dashboard</h1>
+        
+        <form id="health-form" class="form">
+            <label for="user_id">User ID:</label>
+            <input type="text" id="user_id" class="input-box" required>
+            
+            <label for="blood_pressure">Blood Pressure (e.g., 120/80):</label>
+            <input type="text" id="blood_pressure" class="input-box" required>
+            
+            <label for="blood_sugar">Blood Sugar (mg/dL):</label>
+            <input type="number" id="blood_sugar" class="input-box" required>
+            
+            <label for="heart_rate">Heart Rate (bpm):</label>
+            <input type="number" id="heart_rate" class="input-box" required>
+            
+            <button type="submit">Submit Health Data</button>
+        </form>
+        
+        <div class="dashboard-grid">
+            <div class="card health-metrics">
+                <h2>Your Health Metrics</h2>
+                <div class="metrics-container" id="health-metrics-container">
+                    <!-- Health metrics will be populated by JavaScript -->
+                </div>
+                <div class="chart-container">
+                    <canvas id="healthChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Risk Assessment</h2>
+                <div id="risk-factor">
+                    <!-- Risk assessment will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Dietary Suggestions</h2>
+                <div id="diet">
+                    <!-- Dietary suggestions will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Recommended Physical Activities</h2>
+                <div id="activities">
+                    <!-- Activity suggestions will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Doctor Profiles</h2>
+                <div class="profiles-grid" id="doctors">
+                    <!-- Doctor profiles will be populated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Nearby Hospitals</h2>
+                <div id="hospitals">
+                    <!-- Hospital profiles will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up form submission
+            document.getElementById('health-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateDashboard();
+            });
+            
+            // Initialize with sample data
+            initializeSampleData();
+        });
+        
+        function initializeSampleData() {
+            document.getElementById('user_id').value = 'USER12345';
+            document.getElementById('blood_pressure').value = '130/85';
+            document.getElementById('blood_sugar').value = '110';
+            document.getElementById('heart_rate').value = '78';
+            
+            updateDashboard();
+        }
+        
+        function updateDashboard() {
+            // Get form values
+            const userId = document.getElementById('user_id').value;
+            const bloodPressure = document.getElementById('blood_pressure').value;
+            const bloodSugar = parseInt(document.getElementById('blood_sugar').value);
+            const heartRate = parseInt(document.getElementById('heart_rate').value);
+            
+            // Parse blood pressure
+            const bpParts = bloodPressure.split('/');
+            const systolic = parseInt(bpParts[0]);
+            const diastolic = parseInt(bpParts[1]);
+            
+            // Update health metrics
+            updateHealthMetrics(systolic, diastolic, bloodSugar, heartRate);
+            
+            // Update risk assessment
+            updateRiskAssessment(systolic, diastolic, bloodSugar, heartRate);
+            
+            // Update suggestions
+            updateDietarySuggestions(bloodSugar, systolic);
+            updateActivitySuggestions(heartRate, bloodSugar);
+            
+            // Update doctor and hospital profiles
+            updateDoctorProfiles();
+            updateHospitalProfiles();
+            
+            // Update chart
+            updateHealthChart(systolic, diastolic, bloodSugar, heartRate);
+        }
+        
+        function updateHealthMetrics(systolic, diastolic, bloodSugar, heartRate) {
+            const container = document.getElementById('health-metrics-container');
+            
+            // Determine status for each metric
+            const bpStatus = getBPStatus(systolic, diastolic);
+            const sugarStatus = getSugarStatus(bloodSugar);
+            const hrStatus = getHRStatus(heartRate);
+            
+            container.innerHTML = `
+                <div class="metric-card ${bpStatus}">
+                    <div class="metric-value">${systolic}/${diastolic}</div>
+                    <div class="metric-label">Blood Pressure</div>
+                </div>
+                <div class="metric-card ${sugarStatus}">
+                    <div class="metric-value">${bloodSugar}</div>
+                    <div class="metric-label">Blood Sugar (mg/dL)</div>
+                </div>
+                <div class="metric-card ${hrStatus}">
+                    <div class="metric-value">${heartRate}</div>
+                    <div class="metric-label">Heart Rate (bpm)</div>
+                </div>
+                <div class="metric-card normal">
+                    <div class="metric-value">${calculateOverallHealth(bpStatus, sugarStatus, hrStatus)}%</div>
+                    <div class="metric-label">Overall Health Score</div>
+                </div>
+            `;
+        }
+        
+        function updateRiskAssessment(systolic, diastolic, bloodSugar, heartRate) {
+            const container = document.getElementById('risk-factor');
+            
+            // Calculate risk levels
+            const bpRisk = getBPRisk(systolic, diastolic);
+            const sugarRisk = getSugarRisk(bloodSugar);
+            const hrRisk = getHRRisk(heartRate);
+            
+            container.innerHTML = `
+                <div class="risk-indicator ${bpRisk.level}">
+                    <div class="risk-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="risk-info">
+                        <h4>Blood Pressure Risk: ${bpRisk.level.toUpperCase()}</h4>
+                        <p>${bpRisk.message}</p>
+                    </div>
+                </div>
+                <div class="risk-indicator ${sugarRisk.level}">
+                    <div class="risk-icon">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <div class="risk-info">
+                        <h4>Blood Sugar Risk: ${sugarRisk.level.toUpperCase()}</h4>
+                        <p>${sugarRisk.message}</p>
+                    </div>
+                </div>
+                <div class="risk-indicator ${hrRisk.level}">
+                    <div class="risk-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="risk-info">
+                        <h4>Heart Rate Risk: ${hrRisk.level.toUpperCase()}</h4>
+                        <p>${hrRisk.message}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Add Font Awesome icons
+            addIcons();
+        }
+        
+        function updateDietarySuggestions(bloodSugar, systolic) {
+            const container = document.getElementById('diet');
+            let suggestions = [];
+            
+            if (bloodSugar > 126) {
+                suggestions.push("Limit sugar and refined carbohydrates");
+                suggestions.push("Increase fiber intake with vegetables and whole grains");
+                suggestions.push("Choose lean protein sources");
+            } else {
+                suggestions.push("Maintain balanced meals with complex carbs");
+                suggestions.push("Include healthy fats like avocados and nuts");
+            }
+            
+            if (systolic > 130) {
+                suggestions.push("Reduce sodium intake to less than 2,300mg daily");
+                suggestions.push("Increase potassium-rich foods like bananas and spinach");
+                suggestions.push("Limit processed foods and canned goods");
+            } else {
+                suggestions.push("Continue heart-healthy diet with variety of fruits and vegetables");
+            }
+            
+            suggestions.push("Stay hydrated with water throughout the day");
+            suggestions.push("Eat regular meals to maintain stable blood sugar");
+            
+            container.innerHTML = `<ul class="suggestion-list">${suggestions.map(s => `<li>${s}</li>`).join('')}</ul>`;
+        }
+        
+        function updateActivitySuggestions(heartRate, bloodSugar) {
+            const container = document.getElementById('activities');
+            let suggestions = [];
+            
+            if (heartRate > 100) {
+                suggestions.push("Start with light walking 15-20 minutes daily");
+                suggestions.push("Practice deep breathing exercises to lower heart rate");
+                suggestions.push("Try yoga or tai chi for gentle movement");
+            } else {
+                suggestions.push("Aim for 30 minutes of moderate activity 5 days/week");
+                suggestions.push("Include both cardio and strength training");
+            }
+            
+            if (bloodSugar > 126) {
+                suggestions.push("Regular aerobic exercise to improve insulin sensitivity");
+                suggestions.push("Resistance training 2-3 times per week");
+                suggestions.push("Avoid prolonged sitting - take active breaks");
+            } else {
+                suggestions.push("Maintain regular physical activity routine");
+                suggestions.push("Mix different types of exercise for variety");
+            }
+            
+            suggestions.push("Monitor intensity using perceived exertion scale");
+            suggestions.push("Stay consistent with your exercise schedule");
+            
+            container.innerHTML = `<ul class="suggestion-list">${suggestions.map(s => `<li>${s}</li>`).join('')}</ul>`;
+        }
+        
+        function updateDoctorProfiles() {
+            const container = document.getElementById('doctors');
+            
+            const doctors = [
+                { name: "Dr. Sarah Johnson", specialty: "Cardiology", experience: "15 years", availability: "Mon, Wed, Fri" },
+                { name: "Dr. Michael Chen", specialty: "Endocrinology", experience: "12 years", availability: "Tue, Thu" },
+                { name: "Dr. Emily Rodriguez", specialty: "Internal Medicine", experience: "10 years", availability: "Mon-Fri" },
+                { name: "Dr. James Wilson", specialty: "Nutrition", experience: "8 years", availability: "Wed, Thu, Sat" }
+            ];
+            
+            container.innerHTML = doctors.map(doctor => `
+                <div class="profile-card">
+                    <div class="profile-avatar">${doctor.name.split(' ').map(n => n[0]).join('')}</div>
+                    <div class="profile-info">
+                        <h4>${doctor.name}</h4>
+                        <p>${doctor.specialty}</p>
+                        <p>${doctor.experience} experience</p>
+                        <p>Available: ${doctor.availability}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateHospitalProfiles() {
+            const container = document.getElementById('hospitals');
+            
+            const hospitals = [
+                { name: "City General Hospital", distance: "2.5 miles", services: "Emergency, Cardiology, Lab", rating: "4.7/5" },
+                { name: "Westside Medical Center", distance: "3.8 miles", services: "Endocrinology, Nutrition, Pharmacy", rating: "4.5/5" },
+                { name: "Northside Community Hospital", distance: "5.2 miles", services: "Primary Care, Lab, Radiology", rating: "4.3/5" }
+            ];
+            
+            container.innerHTML = hospitals.map(hospital => `
+                <div class="hospital-card">
+                    <div class="hospital-header">
+                        <div class="hospital-name">${hospital.name}</div>
+                        <div class="hospital-distance">${hospital.distance}</div>
+                    </div>
+                    <div class="hospital-details">
+                        <p>Services: ${hospital.services}</p>
+                        <p>Rating: ${hospital.rating}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateHealthChart(systolic, diastolic, bloodSugar, heartRate) {
+            const ctx = document.getElementById('healthChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.healthChartInstance) {
+                window.healthChartInstance.destroy();
+            }
+            
+            window.healthChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Systolic BP', 'Diastolic BP', 'Blood Sugar', 'Heart Rate'],
+                    datasets: [{
+                        label: 'Your Values',
+                        data: [systolic, diastolic, bloodSugar, heartRate],
+                        backgroundColor: [
+                            getColorForValue(systolic, 'systolic'),
+                            getColorForValue(diastolic, 'diastolic'),
+                            getColorForValue(bloodSugar, 'sugar'),
+                            getColorForValue(heartRate, 'hr')
+                        ],
+                        borderColor: [
+                            getBorderColorForValue(systolic, 'systolic'),
+                            getBorderColorForValue(diastolic, 'diastolic'),
+                            getBorderColorForValue(bloodSugar, 'sugar'),
+                            getBorderColorForValue(heartRate, 'hr')
+                        ],
+                        borderWidth: 1
+                    }, {
+                        label: 'Normal Range Max',
+                        data: [120, 80, 100, 100],
+                        backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                        borderColor: 'rgba(46, 204, 113, 1)',
+                        borderWidth: 1,
+                        type: 'line',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Measurement Value'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Health Metrics Comparison'
+                        },
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Helper functions for status determination
+        function getBPStatus(systolic, diastolic) {
+            if (systolic < 120 && diastolic < 80) return 'normal';
+            if (systolic < 130 && diastolic < 80) return 'warning';
+            if (systolic < 140 && diastolic < 90) return 'warning';
+            return 'danger';
+        }
+        
+        function getSugarStatus(sugar) {
+            if (sugar < 100) return 'normal';
+            if (sugar < 126) return 'warning';
+            return 'danger';
+        }
+        
+        function getHRStatus(hr) {
+            if (hr >= 60 && hr <= 100) return 'normal';
+            if (hr > 100 && hr <= 120) return 'warning';
+            return 'danger';
+        }
+        
+        function getBPRisk(systolic, diastolic) {
+            if (systolic < 120 && diastolic < 80) 
+                return { level: 'risk-low', message: 'Your blood pressure is within normal range.' };
+            if (systolic < 130 && diastolic < 80) 
+                return { level: 'risk-medium', message: 'Your blood pressure is elevated. Monitor regularly.' };
+            if (systolic < 140 && diastolic < 90) 
+                return { level: 'risk-medium', message: 'You have Stage 1 hypertension. Consult your doctor.' };
+            return { level: 'risk-high', message: 'You have Stage 2 hypertension. Seek medical attention.' };
+        }
+        
+        function getSugarRisk(sugar) {
+            if (sugar < 100) 
+                return { level: 'risk-low', message: 'Your blood sugar is within normal range.' };
+            if (sugar < 126) 
+                return { level: 'risk-medium', message: 'You have prediabetes. Focus on lifestyle changes.' };
+            return { level: 'risk-high', message: 'You may have diabetes. Consult your doctor.' };
+        }
+        
+        function getHRRisk(hr) {
+            if (hr >= 60 && hr <= 100) 
+                return { level: 'risk-low', message: 'Your heart rate is within normal range.' };
+            if (hr > 100 && hr <= 120) 
+                return { level: 'risk-medium', message: 'Your heart rate is elevated. Consider stress reduction.' };
+            return { level: 'risk-high', message: 'Your heart rate is high. Consult your doctor.' };
+        }
+        
+        function calculateOverallHealth(bpStatus, sugarStatus, hrStatus) {
+            let score = 100;
+            if (bpStatus === 'warning') score -= 15;
+            if (bpStatus === 'danger') score -= 30;
+            if (sugarStatus === 'warning') score -= 15;
+            if (sugarStatus === 'danger') score -= 30;
+            if (hrStatus === 'warning') score -= 10;
+            if (hrStatus === 'danger') score -= 20;
+            return Math.max(score, 0);
+        }
+        
+        function getColorForValue(value, type) {
+            switch(type) {
+                case 'systolic':
+                    if (value < 120) return 'rgba(46, 204, 113, 0.7)';
+                    if (value < 130) return 'rgba(243, 156, 18, 0.7)';
+                    return 'rgba(231, 76, 60, 0.7)';
+                case 'diastolic':
+                    if (value < 80) return 'rgba(46, 204, 113, 0.7)';
+                    if (value < 85) return 'rgba(243, 156, 18, 0.7)';
+                    return 'rgba(231, 76, 60, 0.7)';
+                case 'sugar':
+                    if (value < 100) return 'rgba(46, 204, 113, 0.7)';
+                    if (value < 126) return 'rgba(243, 156, 18, 0.7)';
+                    return 'rgba(231, 76, 60, 0.7)';
+                case 'hr':
+                    if (value >= 60 && value <= 100) return 'rgba(46, 204, 113, 0.7)';
+                    if (value > 100 && value <= 120) return 'rgba(243, 156, 18, 0.7)';
+                    return 'rgba(231, 76, 60, 0.7)';
+                default:
+                    return 'rgba(149, 165, 166, 0.7)';
+            }
+        }
+        
+        function getBorderColorForValue(value, type) {
+            switch(type) {
+                case 'systolic':
+                    if (value < 120) return 'rgb(46, 204, 113)';
+                    if (value < 130) return 'rgb(243, 156, 18)';
+                    return 'rgb(231, 76, 60)';
+                case 'diastolic':
+                    if (value < 80) return 'rgb(46, 204, 113)';
+                    if (value < 85) return 'rgb(243, 156, 18)';
+                    return 'rgb(231, 76, 60)';
+                case 'sugar':
+                    if (value < 100) return 'rgb(46, 204, 113)';
+                    if (value < 126) return 'rgb(243, 156, 18)';
+                    return 'rgb(231, 76, 60)';
+                case 'hr':
+                    if (value >= 60 && value <= 100) return 'rgb(46, 204, 113)';
+                    if (value > 100 && value <= 120) return 'rgb(243, 156, 18)';
+                    return 'rgb(231, 76, 60)';
+                default:
+                    return 'rgb(149, 165, 166)';
+            }
+        }
+        
+        function addIcons() {
+            // Since we can't load Font Awesome in this environment, we'll use Unicode characters
+            const icons = document.querySelectorAll('.risk-icon i');
+            icons.forEach(icon => {
+                if (icon.classList.contains('fa-heartbeat')) {
+                    icon.textContent = '❤';
+                } else if (icon.classList.contains('fa-tint')) {
+                    icon.textContent = '💧';
+                } else if (icon.classList.contains('fa-heart')) {
+                    icon.textContent = '💓';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

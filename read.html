@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCD Risk Management Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: var(--gradient);
+            color: white;
+            padding: 25px 0;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+        }
+        
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .stats-overview {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 150px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 25px;
+        }
+        
+        .sidebar {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+        
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--light);
+        }
+        
+        .nav-item.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .ncd-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .ncd-card {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .ncd-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .ncd-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .ncd-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .ncd-card.cardiovascular .ncd-icon {
+            background-color: #e74c3c;
+        }
+        
+        .ncd-card.cancer .ncd-icon {
+            background-color: #9b59b6;
+        }
+        
+        .ncd-card.diabetes .ncd-icon {
+            background-color: #3498db;
+        }
+        
+        .ncd-card.respiratory .ncd-icon {
+            background-color: #1abc9c;
+        }
+        
+        .ncd-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .risk-factors {
+            list-style: none;
+            margin-top: 10px;
+        }
+        
+        .risk-factors li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .risk-factors li:before {
+            content: "•";
+            color: var(--secondary);
+            position: absolute;
+            left: 0;
+        }
+        
+        .risk-assessment {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .assessment-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .risk-results {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .risk-level {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .risk-low {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+        
+        .risk-medium {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: #d35400;
+            border: 1px solid #d35400;
+        }
+        
+        .risk-high {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+            border: 1px solid #c0392b;
+        }
+        
+        .report-section {
+            margin-top: 30px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--secondary);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            margin-bottom: 15px;
+        }
+        
+        .btn-upload {
+            background-color: var(--secondary);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .prevention-tips {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .tips-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .tip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 6px;
+        }
+        
+        .tip i {
+            color: var(--success);
+            font-size: 1.2rem;
+        }
+        
+        .action-plan {
+            margin-top: 30px;
+        }
+        
+        .plan-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .step {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background-color: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .stats-overview {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .ncd-grid, .assessment-form, .tips-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-heartbeat"></i>
+                    <h1>NCD Risk Management Dashboard</h1>
+                </div>
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-value">41M</div>
+                        <div class="stat-label">Annual NCD Deaths</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">74%</div>
+                        <div class="stat-label">Of Global Deaths</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">85%</div>
+                        <div class="stat-label">Premature Deaths</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="dashboard">
+            <div class="sidebar">
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-tab="ncd-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>NCD Information</span>
+                    </li>
+                    <li class="nav-item" data-tab="risk-assessment">
+                        <i class="fas fa-stethoscope"></i>
+                        <span>Risk Assessment</span>
+                    </li>
+                    <li class="nav-item" data-tab="reports">
+                        <i class="fas fa-file-medical-alt"></i>
+                        <span>Blood Reports</span>
+                    </li>
+                    <li class="nav-item" data-tab="prevention">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Prevention</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="main-content">
+                <!-- NCD Information Tab -->
+                <div class="tab-content active" id="ncd-info">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Non-Communicable Diseases (NCDs)</h2>
+                        </div>
+                        <p>Non-communicable diseases (NCDs) are medical conditions that are not infectious and typically have a prolonged course. They account for the majority of deaths worldwide and include cardiovascular diseases, cancers, chronic respiratory diseases, and diabetes.</p>
+                        
+                        <div class="ncd-grid">
+                            <div class="ncd-card cardiovascular">
+                                <div class="ncd-header">
+                                    <div class="ncd-icon">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                    <h3 class="ncd-name">Cardiovascular Diseases</h3>
+                                </div>
+                                <p>Disorders of the heart and blood vessels including coronary heart disease, cerebrovascular disease, and hypertension.</p>
+                                <ul class="risk-factors">
+                                    <li>High blood pressure</li>
+                                    <li>High cholesterol</li>
+                                    <li>Diabetes</li>
+                                    <li>Smoking</li>
+                                    <li>Obesity</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="ncd-card cancer">
+                                <div class="ncd-header">
+                                    <div class="ncd-icon">
+                                        <i class="fas fa-band-aid"></i>
+                                    </div>
+                                    <h3 class="ncd-name">Cancers</h3>
+                                </div>
+                                <p>Abnormal cell growth with potential to invade or spread to other parts of the body.</p>
+                                <ul class="risk-factors">
+                                    <li>Tobacco use</li>
+                                    <li>Unhealthy diet</li>
+                                    <li>Physical inactivity</li>
+                                    <li>Alcohol consumption</li>
+                                    <li>Environmental factors</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="ncd-card diabetes">
+                                <div class="ncd-header">
+                                    <div class="ncd-icon">
+                                        <i class="fas fa-syringe"></i>
+                                    </div>
+                                    <h3 class="ncd-name">Diabetes</h3>
+                                </div>
+                                <p>Chronic disease that occurs when the pancreas does not produce enough insulin or when the body cannot effectively use the insulin it produces.</p>
+                                <ul class="risk-factors">
+                                    <li>Overweight/obesity</li>
+                                    <li>Unhealthy diet</li>
+                                    <li>Physical inactivity</li>
+                                    <li>Family history</li>
+                                    <li>Age</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="ncd-card respiratory">
+                                <div class="ncd-header">
+                                    <div class="ncd-icon">
+                                        <i class="fas fa-lungs"></i>
+                                    </div>
+                                    <h3 class="ncd-name">Chronic Respiratory Diseases</h3>
+                                </div>
+                                <p>Diseases of the airways and other structures of the lung, including asthma and chronic obstructive pulmonary disease (COPD).</p>
+                                <ul class="risk-factors">
+                                    <li>Tobacco smoking</li>
+                                    <li>Air pollution</li>
+                                    <li>Occupational chemicals and dusts</li>
+                                    <li>Frequent lower respiratory infections</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Global NCD Impact</h2>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="globalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Risk Assessment Tab -->
+                <div class="tab-content" id="risk-assessment">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">NCD Risk Assessment</h2>
+                        </div>
+                        <p>Complete the form below to assess your risk for developing non-communicable diseases. This assessment is based on established medical guidelines and provides personalized risk analysis.</p>
+                        
+                        <div class="risk-assessment">
+                            <form id="risk-form" class="assessment-form">
+                                <div class="form-group">
+                                    <label for="age">Age</label>
+                                    <input type="number" id="age" class="form-control" min="18" max="100" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="gender">Gender</label>
+                                    <select id="gender" class="form-control" required>
+                                        <option value="">Select</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="bmi">BMI</label>
+                                    <input type="number" id="bmi" class="form-control" min="15" max="50" step="0.1" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="systolic">Systolic BP (mmHg)</label>
+                                    <input type="number" id="systolic" class="form-control" min="80" max="200" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="diastolic">Diastolic BP (mmHg)</label>
+                                    <input type="number" id="diastolic" class="form-control" min="50" max="130" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="cholesterol">Total Cholesterol (mg/dL)</label>
+                                    <input type="number" id="cholesterol" class="form-control" min="100" max="400" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="glucose">Fasting Glucose (mg/dL)</label>
+                                    <input type="number" id="glucose" class="form-control" min="50" max="300" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="smoking">Smoking Status</label>
+                                    <select id="smoking" class="form-control" required>
+                                        <option value="">Select</option>
+                                        <option value="never">Never Smoked</option>
+                                        <option value="former">Former Smoker</option>
+                                        <option value="current">Current Smoker</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="activity">Physical Activity</label>
+                                    <select id="activity" class="form-control" required>
+                                        <option value="">Select</option>
+                                        <option value="sedentary">Sedentary</option>
+                                        <option value="light">Light Activity</option>
+                                        <option value="moderate">Moderate Activity</option>
+                                        <option value="active">Active</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="family">Family History of NCDs</label>
+                                    <select id="family" class="form-control" required>
+                                        <option value="">Select</option>
+                                        <option value="no">No</option>
+                                        <option value="yes">Yes</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group" style="grid-column: 1 / -1;">
+                                    <button type="submit" class="btn btn-primary">Assess My Risk</button>
+                                </div>
+                            </form>
+                            
+                            <div class="risk-results" id="risk-results">
+                                <!-- Risk results will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Risk Factors Analysis</h2>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="riskChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reports Tab -->
+                <div class="tab-content" id="reports">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Blood Report Analysis</h2>
+                        </div>
+                        <p>Upload your blood test reports for comprehensive analysis and personalized health insights.</p>
+                        
+                        <div class="report-section">
+                            <div class="upload-area" id="uploadArea">
+                                <div class="upload-icon">
+                                    <i class="fas fa-file-upload"></i>
+                                </div>
+                                <div class="upload-text">
+                                    <h3>Upload Blood Test Report</h3>
+                                    <p>Supported formats: PDF, JPG, PNG (Max: 10MB)</p>
+                                </div>
+                                <input type="file" id="reportUpload" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                                <button class="btn-upload" id="uploadButton">Choose File</button>
+                            </div>
+                            
+                            <div id="uploadedReports" style="display: none;">
+                                <h3>Your Uploaded Reports</h3>
+                                <div id="reportList">
+                                    <!-- Uploaded reports will be listed here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Report Analysis</h2>
+                        </div>
+                        <div id="reportAnalysis">
+                            <p>Upload a blood report to see detailed analysis and recommendations.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Prevention Tab -->
+                <div class="tab-content" id="prevention">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">NCD Prevention Strategies</h2>
+                        </div>
+                        
+                        <div class="prevention-tips">
+                            <h3>Reduce Your NCD Risk</h3>
+                            <div class="tips-list">
+                                <div class="tip">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Regular physical activity</span>
+                                </div>
+                                <div class="tip">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Balanced healthy diet</span>
+                                </div>
+                                <div class="tip">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Avoid tobacco use</span>
+                                </div>
+                                <div class="tip">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Limit alcohol consumption</span>
+                                </div>
+                                <div class="tip">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Regular health screenings</span>
+                                </div>
+                                <div class="tip">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Manage stress effectively</span>
+                                </div>
+                                <div class="tip">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Maintain healthy weight</span>
+                                </div>
+                                <div class="tip">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Get adequate sleep</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-plan">
+                            <h3>Personalized Action Plan</h3>
+                            <div class="plan-steps">
+                                <div class="step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h4>Schedule Health Screening</h4>
+                                        <p>Complete comprehensive health assessment with your physician</p>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h4>Implement Dietary Changes</h4>
+                                        <p>Reduce salt, sugar, and saturated fats; increase fruits and vegetables</p>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h4>Start Exercise Routine</h4>
+                                        <p>30 minutes of moderate activity, 5 days per week</p>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <h4>Monitor Progress</h4>
+                                        <p>Track key health metrics and adjust plan as needed</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>NCD Risk Management Dashboard &copy; 2023 | Data Source: World Health Organization</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up tab navigation
+            setupTabNavigation();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Set up form submission
+            document.getElementById('risk-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateRisk();
+            });
+            
+            // Set up file upload
+            document.getElementById('uploadButton').addEventListener('click', function() {
+                document.getElementById('reportUpload').click();
+            });
+            
+            document.getElementById('reportUpload').addEventListener('change', function(e) {
+                handleFileUpload(e);
+            });
+        });
+        
+        function setupTabNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items and contents
+                    navItems.forEach(i => i.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+        
+        function initializeCharts() {
+            // Global Impact Chart
+            const globalCtx = document.getElementById('globalChart').getContext('2d');
+            const globalChart = new Chart(globalCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Cardiovascular Diseases', 'Cancers', 'Respiratory Diseases', 'Diabetes', 'Other NCDs'],
+                    datasets: [{
+                        data: [32, 22, 10, 6, 4],
+                        backgroundColor: [
+                            'rgba(231, 76, 60, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(26, 188, 156, 0.7)',
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(149, 165, 166, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(231, 76, 60)',
+                            'rgb(155, 89, 182)',
+                            'rgb(26, 188, 156)',
+                            'rgb(52, 152, 219)',
+                            'rgb(149, 165, 166)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Global NCD Death Distribution (%)'
+                        }
+                    }
+                }
+            });
+            
+            // Risk Factors Chart
+            const riskCtx = document.getElementById('riskChart').getContext('2d');
+            const riskChart = new Chart(riskCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['High BP', 'High Cholesterol', 'Smoking', 'Obesity', 'Physical Inactivity', 'Unhealthy Diet'],
+                    datasets: [{
+                        label: 'Population Risk Factor Prevalence (%)',
+                        data: [30, 39, 22, 28, 35, 42],
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgb(52, 152, 219)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Percentage'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Common NCD Risk Factors in Population'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function calculateRisk() {
+            // Get form values
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const bmi = parseFloat(document.getElementById('bmi').value);
+            const systolic = parseInt(document.getElementById('systolic').value);
+            const diastolic = parseInt(document.getElementById('diastolic').value);
+            const cholesterol = parseInt(document.getElementById('cholesterol').value);
+            const glucose = parseInt(document.getElementById('glucose').value);
+            const smoking = document.getElementById('smoking').value;
+            const activity = document.getElementById('activity').value;
+            const family = document.getElementById('family').value;
+            
+            // Calculate risk score (simplified algorithm for demonstration)
+            let riskScore = 0;
+            
+            // Age factor
+            if (age >= 60) riskScore += 30;
+            else if (age >= 45) riskScore += 20;
+            else if (age >= 30) riskScore += 10;
+            
+            // BMI factor
+            if (bmi >= 30) riskScore += 25;
+            else if (bmi >= 25) riskScore += 15;
+            
+            // Blood pressure factor
+            if (systolic >= 140 || diastolic >= 90) riskScore += 20;
+            else if (systolic >= 130 || diastolic >= 85) riskScore += 10;
+            
+            // Cholesterol factor
+            if (cholesterol >= 240) riskScore += 15;
+            else if (cholesterol >= 200) riskScore += 10;
+            
+            // Glucose factor
+            if (glucose >= 126) riskScore += 20;
+            else if (glucose >= 100) riskScore += 10;
+            
+            // Smoking factor
+            if (smoking === 'current') riskScore += 25;
+            else if (smoking === 'former') riskScore += 10;
+            
+            // Activity factor
+            if (activity === 'sedentary') riskScore += 15;
+            else if (activity === 'light') riskScore += 10;
+            
+            // Family history factor
+            if (family === 'yes') riskScore += 10;
+            
+            // Determine risk level
+            let riskLevel, riskMessage, riskClass;
+            
+            if (riskScore >= 80) {
+                riskLevel = "High";
+                riskMessage = "You have a high risk of developing NCDs. Please consult with a healthcare provider for comprehensive assessment and management.";
+                riskClass = "risk-high";
+            } else if (riskScore >= 50) {
+                riskLevel = "Medium";
+                riskMessage = "You have a moderate risk of developing NCDs. Consider lifestyle modifications and regular health screenings.";
+                riskClass = "risk-medium";
+            } else {
+                riskLevel = "Low";
+                riskMessage = "You have a low risk of developing NCDs. Continue maintaining healthy lifestyle habits.";
+                riskClass = "risk-low";
+            }
+            
+            // Display results
+            const resultsDiv = document.getElementById('risk-results');
+            resultsDiv.innerHTML = `
+                <div class="risk-level ${riskClass}">
+                    <h3>Your NCD Risk Level: ${riskLevel}</h3>
+                    <p>Risk Score: ${riskScore}/150</p>
+                </div>
+                <p>${riskMessage}</p>
+                <h4>Key Recommendations:</h4>
+                <ul>
+                    <li>Maintain healthy weight (BMI 18.5-24.9)</li>
+                    <li>Keep blood pressure below 120/80 mmHg</li>
+                    <li>Maintain total cholesterol below 200 mg/dL</li>
+                    <li>Keep fasting glucose below 100 mg/dL</li>
+                    <li>Avoid tobacco in any form</li>
+                    <li>Engage in regular physical activity</li>
+                </ul>
+            `;
+            resultsDiv.style.display = 'block';
+        }
+        
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type and size
+            const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                alert('Please upload a PDF, JPG, or PNG file.');
+                return;
+            }
+            
+            if (file.size > 10 * 1024 * 1024) { // 10MB
+                alert('File size must be less than 10MB.');
+                return;
+            }
+            
+            // Update UI to show uploaded file
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.innerHTML = `
+                <div class="upload-icon">
+                    <i class="fas fa-file-check" style="color: #2ecc71;"></i>
+                </div>
+                <div class="upload-text">
+                    <h3>File Uploaded Successfully</h3>
+                    <p>${file.name}</p>
+                </div>
+                <button class="btn-upload" onclick="resetUpload()">Upload Another</button>
+            `;
+            
+            // Show uploaded reports section
+            document.getElementById('uploadedReports').style.display = 'block';
+            
+            // Add to report list
+            const reportList = document.getElementById('reportList');
+            const reportItem = document.createElement('div');
+            reportItem.className = 'report-item';
+            reportItem.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee;">
+                    <div>
+                        <i class="fas fa-file-medical"></i>
+                        <span style="margin-left: 10px;">${file.name}</span>
+                    </div>
+                    <div>
+                        <button class="btn-upload" style="background-color: #3498db;">Analyze</button>
+                        <button class="btn-upload" style="background-color: #e74c3c; margin-left: 5px;">Delete</button>
+                    </div>
+                </div>
+            `;
+            reportList.appendChild(reportItem);
+            
+            // Show analysis (simulated)
+            document.getElementById('reportAnalysis').innerHTML = `
+                <h3>Blood Report Analysis</h3>
+                <p>Based on your uploaded report, here's our analysis:</p>
+                <div class="risk-level risk-medium">
+                    <h4>Overall Health Status: Moderate Risk</h4>
+                </div>
+                <h4>Key Findings:</h4>
+                <ul>
+                    <li>Elevated LDL Cholesterol: 145 mg/dL (Target: <100 mg/dL)</li>
+                    <li>Fasting Blood Glucose: 108 mg/dL (Target: <100 mg/dL)</li>
+                    <li>Blood Pressure: 132/84 mmHg (Target: <120/80 mmHg)</li>
+                </ul>
+                <h4>Recommendations:</h4>
+                <ul>
+                    <li>Consult with a cardiologist for cholesterol management</li>
+                    <li>Implement dietary changes to reduce saturated fats</li>
+                    <li>Increase physical activity to 150 minutes per week</li>
+                    <li>Follow up with fasting glucose test in 3 months</li>
+                </ul>
+            `;
+        }
+        
+        function resetUpload() {
+            document.getElementById('uploadArea').innerHTML = `
+                <div class="upload-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <div class="upload-text">
+                    <h3>Upload Blood Test Report</h3>
+                    <p>Supported formats: PDF, JPG, PNG (Max: 10MB)</p>
+                </div>
+                <input type="file" id="reportUpload" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                <button class="btn-upload" id="uploadButton">Choose File</button>
+            `;
+            
+            // Reattach event listeners
+            document.getElementById('uploadButton').addEventListener('click', function() {
+                document.getElementById('reportUpload').click();
+            });
+            document.getElementById('reportUpload').addEventListener('change', function(e) {
+                handleFileUpload(e);
+            });
+        }
+    </script>
+</body>
+</html>

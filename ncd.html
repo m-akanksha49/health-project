@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skewed Collage with Disease Info</title>
+    <style>
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #dfe4e0; 
+            font-family: Arial, sans-serif;
+        }
+        .main-heading {
+            text-align: center;
+            color: #239f85; 
+            font-size: 3.5rem;
+            margin-bottom: 560px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); 
+            width: 100%;
+        }
+
+        
+        .collage-container {
+            position: relative;
+            width: 900px;
+            height: 600px;
+            background-color:#bae4db ;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px; 
+            overflow: hidden; 
+        }
+
+        .collage {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 5px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .collage div {
+            background-color: #239f85; 
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #239f85; 
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .collage div:hover {
+            transform: scale(1.05);
+        }
+
+        .tile1 {
+            background-image: url(https://th.bing.com/th/id/OIP.zODQmO-rdPOuqvF9X0eQXgHaEK?rs=1&pid=ImgDetMain);
+            background-size: cover;        
+            background-position: center;    
+            background-repeat: no-repeat; 
+            transform: skew(-10deg) translateX(-10px);
+        }
+
+        .tile2 {
+            background-image: url(https://th.bing.com/th/id/OIP.ND30jWx27WU40dyoj4y9sAHaFS?rs=1&pid=ImgDetMain);
+            background-size: cover;        
+            background-position: center;    
+            background-repeat: no-repeat; 
+            transform: skew(5deg) translateX(10px);
+        }
+
+        .tile3 {
+            background-image: url(https://th.bing.com/th/id/OIP.hUXnvTbY7wIPivg9CSEiWwHaE8?w=255&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7); 
+            background-size: cover;        
+            background-position: center;    
+            background-repeat: no-repeat; 
+            transform: skew(-5deg) translateX(-5px);
+        }
+
+        .tile4 {
+            background-image: url(https://th.bing.com/th/id/OIP.XEBQ4r9ug9RudRo1IoOUDQHaE8?w=274&h=183&c=7&r=0&o=5&dpr=1.3&pid=1.7); 
+            background-size: cover;        
+            background-position: center;    
+            background-repeat: no-repeat; 
+            transform: skew(7deg) translateX(7px);
+        }
+
+        .tile5 {
+            background-image: url(https://th.bing.com/th/id/OIP.pCdML6n8uyHTNdwh370WDQHaFn?pid=ImgDet&w=184&h=139&c=7&dpr=1.3); 
+            background-size: cover;        
+            background-position: center;    
+            background-repeat: no-repeat; 
+            transform: skew(-10deg) translateX(-10px);
+        }
+
+        .tile6 {
+            background-image: url(https://th.bing.com/th/id/OIP.mrvd7vFpd0671HEJDD0V2QHaEQ?w=309&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7);
+            background-size: cover;        
+            background-position: center;    
+            background-repeat: no-repeat; 
+            transform: skew(3deg) translateX(5px);
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 20px;
+            width: 500px;
+            background: linear-gradient(135deg, #239f85 0%, #203910 100%); 
+            border-radius: 10px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .info h3 {
+            color: #fff; 
+            margin: 0;
+        }
+
+        .info p {
+            color: #fff; 
+        }
+        .main-info {
+            max-width: 600px;
+            color: #287910;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            text-align: left;
+            position: absolute;
+            margin-left: -702px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="main-heading">The Hidden Killers</h1>
+    <div class="main-info">Did you know that every year, non-communicable diseases (NCDs) like heart disease, diabetes, and cancer take more than 41 million lives? That’s over 70% of all deaths worldwide. Unlike infectious diseases, these “hidden killers” often go unnoticed until they’ve already caused significant harm. They don’t just affect older adults; young people are at risk too. This isn’t just a statistic—it’s a reality that impacts families and communities everywhere. We can no longer afford to ignore these silent threats to our health and well-being.</div>
+    <div class="collage-container">
+        <div class="collage">
+            <div class="tile1" onclick="showInfo('Diabetes')"></div>
+            <div class="tile2" onclick="showInfo('Hypertension')"></div>
+            <div class="tile3" onclick="showInfo('Heart Disease')"></div>
+            <div class="tile4" onclick="showInfo('Obesity')"></div>
+            <div class="tile5" onclick="showInfo('Chronic Respiratory Disease')"></div>
+            <div class="tile6" onclick="showInfo('Cancer')"></div>
+        </div>
+    </div>
+
+    <div class="info" id="infoBox">
+        <h3 id="infoTitle"></h3>
+        <p id="infoText"></p>
+    </div>
+
+    <script>
+        function showInfo(disease) {
+            const infoBox = document.getElementById('infoBox');
+            const infoTitle = document.getElementById('infoTitle');
+            const infoText = document.getElementById('infoText');
+
+            let info = '';
+            switch (disease) {
+                case 'Diabetes':
+                    info = 'Diabetes is a chronic condition where the body does not properly process blood sugar (glucose). Taking care of your health and monitoring your sugar levels is crucial, especially as you age, to avoid serious complications like heart disease and kidney failure.';
+                    break;
+                case 'Hypertension':
+                    info = 'Hypertension, or high blood pressure, often has no symptoms but can lead to heart attacks and strokes. Regular check-ups and maintaining a healthy lifestyle become increasingly important as you grow older.';
+                    break;
+                case 'Heart Disease':
+                    info = 'Heart disease is one of the leading causes of death worldwide. Proper diet, exercise, and avoiding smoking are key to keeping your heart healthy as you age.';
+                    break;
+                case 'Obesity':
+                    info = 'Obesity can lead to many serious health conditions such as diabetes, heart disease, and joint problems. Monitoring your weight and maintaining a balanced diet is crucial, especially as metabolism slows down with age.';
+                    break;
+                case 'Chronic Respiratory Disease':
+                    info = 'Chronic respiratory diseases, such as asthma and COPD, can worsen over time. Monitoring your lung health and avoiding pollutants and smoking is essential, especially as you age.';
+                    break;
+                case 'Cancer':
+                    info = 'Cancer can affect people of any age, but the risk increases as you get older. Early detection and lifestyle adjustments are key to preventing and managing this disease.';
+                    break;
+            }
+
+            infoTitle.innerText = disease;
+            infoText.innerText = info;
+            infoBox.style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
